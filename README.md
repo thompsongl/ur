@@ -1,29 +1,10 @@
-# Frontend Take-Home Assignment
+# UR
 
-Welcome to the WorkOS Frontend Take-Home Assignment!
-
-In this exercise, you'll implement the UI for a simple two-tab layout that lists users and roles. You will also add limited functionality to update users and roles.
-
-You should have received an invitation to view a Figma design file for the take-home assignment. If you haven't received and invitation email, please reach out to us.
-
-To get you started, we've also provided a fully functional backend API. Keep in mind, you won’t need to implement all of the functionality implied by the design or backend API. Make sure to focus on the specific tasks outlined below.
-
-Feel free to use any frontend framework and libraries you prefer — there’s no need to build everything from scratch. At WorkOS, we use [Radix Themes](https://www.radix-ui.com/), and it's perfectly fine if you want to leverage similar libraries. Just be ready to explain your decisions, including why you chose certain libraries and how they benefit the project.
-
-If you have any questions, feel free to reach out — we're happy to clarify anything.
-
-## Time Consideration
-
-We value your time! If this assignment takes you more than 8 hours, please submit whatever you have at that point.
-
-Focus on quality. You should be proud of your submission. While the code doesn't need to be 100% production-ready, it should be polished enough for a demo.
-
-Be sure to include a README that outlines what you'd improve or do differently if you had more time.
+> **U**sers & **R**oles
 
 ## Getting Started
 
-1. **Fork the Repo**: Start by forking this repository so that you have your own version to work with.
-2. **Start the Backend API**:
+1. **Start the Backend API**:
    - Ensure you have the latest version of Node.js.
    - Run the following commands to install dependencies and start the API:
      ```bash
@@ -31,62 +12,57 @@ Be sure to include a README that outlines what you'd improve or do differently i
      npm install
      npm run api
      ```
-3. **Project Setup**: Add your project under the `client` directory.
-
-## Design Reference
-
-Be sure to consult the Figma design file that you were invited to view. You'll need to sign-in to Figma to access the design, so you may need to create a Figma account.
-
-The design is a starting point — you'll need to fill in some details (e.g., loading states, error states, hover states). The "Roles" tab is not designed, so you'll infer the design based on what is provided for the "Users" tab.
-
-For those portions of the exercise in which the design is given, your implementation should match the design as closely as possible. Attention to detail is important. It is certainly acceptable to deviate from the design if you are confident it is an improvement, but please explain your thinking in your README.
-
-## Backend API
-
-The API provides full CRUD support for users and roles, but you won’t need to use every endpoint.
-
-**Do not alter the backend API**.
-
-The API includes intentional latency and random server errors to simulate real-world scenarios. Ensure your front-end handles these gracefully.
-
-You can adjust the API speed using the `SERVER_SPEED` environment variable:
-
-- **slow**: Simulate slower network (`SERVER_SPEED=slow npm run api`)
-- **instant**: Remove latency (`SERVER_SPEED=instant npm run api`)
-
-You can run backend tests by executing `npm run test` in the `server` directory. The test code is located at `server/src/api.test.ts`.
+2. **Start the Frontend**:
+    - Run the following commands to install dependencies and start the client:
+      ```bash
+      cd client
+      npm install
+      npm run dev
+      ```
+    - Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## Tasks Overview
 
-Work on the following tasks in this order. If you can’t complete all tasks, focus on quality rather than quantity.
+1. ✅ Setup the "Users" and "Roles" tab structure
+2. ✅ Add the users table
+3. ✅ Add support for filtering the users table via the "Search" input field
+4. ✅ Add support for deleting a user via the "more" icon button dropdown menu
+5. ✅ Add support for viewing all roles in the "Roles" tab
+6. ✅ Add support for renaming a role in the "Roles" tab
+7. ✅ [Bonus] Add pagination to the user table
 
-1. Setup the "Users" and "Roles" tab structure
-2. Add the users table
-3. Add support for filtering the users table via the "Search" input field
-4. Add support for deleting a user via the "more" icon button dropdown menu
-5. Add support for viewing all roles in the "Roles" tab
-6. Add support for renaming a role in the "Roles" tab
-7. [Bonus] Add pagination to the user table
+## Stack
 
-## Evaluation Criteria
+* Next.js - Framework & routing
+  * React
+  * TypeScript
+* SWR - Data fetching & caching
+* Radix UI Themes - Components & designing
+* Claude Code - Bootstrapping & assisting
 
-We’ll evaluate based on the following:
+### Discussion
 
-- **User Experience (UX)**: Clean and intuitive interface.
-- **Component Composition**: Modular and reusable components.
-- **State Management & Caching**: Efficient handling of data.
-- **Error & Loading States**: Graceful handling of API delays and errors.
-- **CSS Animations**: Best practices followed for smooth UI interactions.
-- **Code Quality**: Clean, well-structured, and maintainable code.
-- **Accessibility**: Keyboard navigation and accessibility considerations.
+#### Distinct routing
+  
+User and roles have their own routes (`/user`, `/role` respectively), with the tabs (`TabNav` + `next/Link` not `Tabs`) triggering browser history changes. I'm a fan of real URLs, but we sacrifice some speed in the transition vs. pure SPA. It defintely offloads the implementaion details to Next.js, which is a choice.
 
-## Submission Guidelines
+#### Hooks
 
-**Please do not submit a pull request to the WorkOS repo.**
+Data layer is all SWR-based hooks (`useUsers`, `useRoles`, `useDeleteUser`, `useRenameRole`). This is very powerful, and I certainly took this as an opportunity to learn the tool. My sense is that there is room for improvement, but I need more time to really get a feel for the tradeoffs vs. vanilla React + fetch. But the built-in optimistic rendering is so cool.
 
-In your forked repository, include a README that explains:
+#### Command/action pattern (or dialog service)
 
-- How to run your project.
-- What you would improve or do differently if you had more time.
+Way beyond the scope here, but I found myself missing a pattern I'd built into recent apps: centralized registry for actions/commands, callable without having to place a configured dialog component, for instance, alongside every place its used. Sets everything up for CMD+K, which eventually someone will ask about.
 
-Once you're ready, share the URL to your GitHub repository with us. Make sure your code runs locally based on the instructions in your README.
+#### More shared components
+
+I foresee an `ActionsMenu` component abstraction. There are enough opinions baked into dialogs (e.g, bold button text, vertical spacing rhythm) that we could create some `Dialog` subcomponents. More variaton in error states (lower severity) could be nice, also.
+
+#### Let's talk about it
+  
+  [A very-WIP PR 👀](https://github.com/thompsongl/ur/pull/1)
+
+  * Pattern where the details view is a sheet/overlay/side panel (just a dialog, but what's a sheet besides a styled dialog?)
+  * Used for both details and editing (not implemented but you can imagine)
+  * Direct URLs for `:id`
+
