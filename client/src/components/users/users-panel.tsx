@@ -54,7 +54,7 @@ export function UsersPanel() {
             placeholder="Search by name..."
           />
         </Box>
-        <Button size="2"><PlusIcon /> Add user</Button>
+        <Button size="2" onClick={() => alert('Not yet implemented')}><PlusIcon /> Add user</Button>
       </Flex>
 
       {usersError && !usersData && (
